@@ -99,3 +99,54 @@ func GetCounting(c *fiber.Ctx) error {
 	//Retorna o resultado
 	return c.JSON(resultMap)
 }
+
+// GetCountingCustom - Rota para conversão de moedas com a cotação customizada
+func GetCountingCustom(c *fiber.Ctx) error {
+	//Receber os parâmetros da URL
+	amount := c.Params("amount")
+	from := strings.ToUpper(c.Params("from"))
+	to := strings.ToUpper(c.Params("to"))
+	rate := c.Params("rate")
+
+	//Converter a string para float64
+	amountFloat, err := strconv.ParseFloat(amount, 64)
+	if err != nil {
+		fmt.Println("Erro ao converter a string para float64:", err)
+	}
+	//Converter a string para float64
+	rateFloat, err := strconv.ParseFloat(rate, 64)
+	if err != nil {
+		fmt.Println("Erro ao converter a string para float64:", err)
+	}
+	//Faz o calculo da conversão
+	total := amountFloat * rateFloat
+
+	//Cria um map para retornar o simbolo da moeda
+	symbols := map[string]string{
+		"BRL": "R$",
+		"USD": "$",
+		"BTC": "₿",
+		"EUR": "€",
+	}
+	//Pega o simbolo da moeda
+	symbol, _ := symbols[to]
+	//Cria um map para retornar o resultado
+	resultMap := map[string]interface{}{
+		"valorConvertido": utils.Round(total, 2),
+		"simboloMoeda":    symbol,
+	}
+	//Salva o resultado no banco de dados
+	save := models.SaveResponse{
+		Amount: utils.Round(amountFloat, 2),
+		From:   from,
+		To:     to,
+		Result: utils.Round(total, 2),
+		Simbol: symbol,
+		Rate:   rateFloat,
+	}
+	//Chama a função para salvar no banco de dados
+	save.Create()
+
+	//Retorna o resultado
+	return c.JSON(resultMap)
+}

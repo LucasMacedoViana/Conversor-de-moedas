@@ -8,5 +8,6 @@ import (
 func Routes() *fiber.App {
 	app := fiber.New(fiber.Config{})
 	app.Get("/exchange/:amount/:from/:to", GetCounting)
+	app.Get("/exchange/:amount/:from/:to/:rate", GetCountingCustom)
 	return app
 }
