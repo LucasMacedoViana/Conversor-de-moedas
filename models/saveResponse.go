@@ -27,3 +27,53 @@ func (s *SaveResponse) Create() error {
 	}
 	return err
 }
+
+// FindAll busca todos os registros da tabela save_responses
+func (s *SaveResponse) FindAll() ([]SaveResponse, error) {
+	connection := config.OpenConnection()
+	defer config.CloseConnection(connection)
+
+	var saveResponses []SaveResponse
+	err := connection.Table("save_responses").Find(&saveResponses).Error
+	if err != nil {
+		return nil, err
+	}
+	return saveResponses, nil
+}
+
+// FindByID busca um registro da tabela save_responses pelo ID
+func (s *SaveResponse) FindByID(id string) (SaveResponse, error) {
+	connection := config.OpenConnection()
+	defer config.CloseConnection(connection)
+
+	var saveResponse SaveResponse
+	err := connection.Table("save_responses").Where("id = ?", id).First(&saveResponse).Error
+	if err != nil {
+		return SaveResponse{}, err
+	}
+	return saveResponse, nil
+}
+
+// DeleteByID deleta um registro da tabela save_responses pelo ID
+func (s *SaveResponse) DeleteByID(id string) error {
+	connection := config.OpenConnection()
+	defer config.CloseConnection(connection)
+
+	err := connection.Table("save_responses").Where("id = ?", id).Delete(&s).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// UpdateByID atualiza um registro da tabela save_responses pelo ID
+func (s *SaveResponse) UpdateByID(id string) error {
+	connection := config.OpenConnection()
+	defer config.CloseConnection(connection)
+
+	err := connection.Table("save_responses").Where("id = ?", id).Updates(&s).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
